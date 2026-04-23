@@ -521,7 +521,7 @@ extension LunaMessage {
     // mode: 0=off, 1=show contents, 2=show alert only
     static func syncNotificationMode(_ mode: UInt8) -> LunaMessage {
         let clamped: UInt8 = min(mode, 2)
-        return .syncSettings([(24, clamped)])
+        return .syncSettings([(UInt8(24), clamped)])
     }
 
     // VFTP: initiate a file transfer (phone → watch)
