@@ -23,6 +23,10 @@
 		A100141400000000000017BB /* BLEDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100141400000000000017FF /* BLEDebugView.swift */; };
 		A100151500000000000018BB /* WatchSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100151500000000000018FF /* WatchSyncManager.swift */; };
 		A100161600000000000019BB /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100161600000000000019FF /* SettingsView.swift */; };
+		A100171700000000000020BB /* LunaPackageCatalogManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100171700000000000020FF /* LunaPackageCatalogManager.swift */; };
+		A100181800000000000021BB /* VFTPTransferManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100181800000000000021FF /* VFTPTransferManager.swift */; };
+		A100191900000000000022BB /* WatchFaceDesignerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100191900000000000022FF /* WatchFaceDesignerManager.swift */; };
+		A100202000000000000023BB /* LibraryAndDesignerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100202000000000000023FF /* LibraryAndDesignerView.swift */; };
 		B100010100000000000001BB /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B100010100000000000001FF /* HealthKit.framework */; };
 		B100020200000000000002BB /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B100020200000000000002FF /* CoreLocation.framework */; };
 		B100030300000000000003BB /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B100030300000000000003FF /* CoreBluetooth.framework */; };
@@ -45,6 +49,10 @@
 		A100141400000000000017FF /* BLEDebugView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BLEDebugView.swift; path = Sources/UI/BLEDebugView.swift; sourceTree = "<group>"; };
 		A100151500000000000018FF /* WatchSyncManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchSyncManager.swift; path = Sources/Core/WatchSyncManager.swift; sourceTree = "<group>"; };
 		A100161600000000000019FF /* SettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SettingsView.swift; path = Sources/UI/SettingsView.swift; sourceTree = "<group>"; };
+		A100171700000000000020FF /* LunaPackageCatalogManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LunaPackageCatalogManager.swift; path = Sources/Core/LunaPackageCatalogManager.swift; sourceTree = "<group>"; };
+		A100181800000000000021FF /* VFTPTransferManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = VFTPTransferManager.swift; path = Sources/Core/VFTPTransferManager.swift; sourceTree = "<group>"; };
+		A100191900000000000022FF /* WatchFaceDesignerManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchFaceDesignerManager.swift; path = Sources/Core/WatchFaceDesignerManager.swift; sourceTree = "<group>"; };
+		A100202000000000000023FF /* LibraryAndDesignerView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LibraryAndDesignerView.swift; path = Sources/UI/LibraryAndDesignerView.swift; sourceTree = "<group>"; };
 		A1000D0D00000000000013FF /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = Info.plist; path = Resources/Info.plist; sourceTree = "<group>"; };
 		A1000E0E00000000000014FF /* LunaWatch.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; name = LunaWatch.entitlements; path = Resources/LunaWatch.entitlements; sourceTree = "<group>"; };
 		A1000F0F00000000000015FF /* LunaWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LunaWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -116,6 +124,9 @@
 				A100070700000000000007FF /* HealthKitManager.swift */,
 				A100131300000000000016FF /* LunaProtocol.swift */,
 				A100151500000000000018FF /* WatchSyncManager.swift */,
+				A100171700000000000020FF /* LunaPackageCatalogManager.swift */,
+				A100181800000000000021FF /* VFTPTransferManager.swift */,
+				A100191900000000000022FF /* WatchFaceDesignerManager.swift */,
 			);
 			name = Core;
 			sourceTree = "<group>";
@@ -129,6 +140,7 @@
 				A1000B0B00000000000011FF /* NotificationsView.swift */,
 				A100141400000000000017FF /* BLEDebugView.swift */,
 				A100161600000000000019FF /* SettingsView.swift */,
+				A100202000000000000023FF /* LibraryAndDesignerView.swift */,
 			);
 			name = UI;
 			sourceTree = "<group>";
@@ -229,6 +241,10 @@
 				A100141400000000000017BB /* BLEDebugView.swift in Sources */,
 				A100151500000000000018BB /* WatchSyncManager.swift in Sources */,
 				A100161600000000000019BB /* SettingsView.swift in Sources */,
+				A100171700000000000020BB /* LunaPackageCatalogManager.swift in Sources */,
+				A100181800000000000021BB /* VFTPTransferManager.swift in Sources */,
+				A100191900000000000022BB /* WatchFaceDesignerManager.swift in Sources */,
+				A100202000000000000023BB /* LibraryAndDesignerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
