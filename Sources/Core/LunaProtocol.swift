@@ -520,7 +520,7 @@ extension LunaMessage {
     // Dedicated "notifications mode" setting update (Android uses SettingsType 24).
     // mode: 0=off, 1=show contents, 2=show alert only
     static func syncNotificationMode(_ mode: UInt8) -> LunaMessage {
-        let clamped = min(mode, 2)
+        let clamped: UInt8 = min(mode, 2)
         return .syncSettings([(24, clamped)])
     }
 
