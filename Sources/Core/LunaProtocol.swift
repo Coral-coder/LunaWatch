@@ -71,7 +71,7 @@ struct LunaMessage {
         let v = raw.leUInt16(at: 2)
         self.type    = LunaMsgType(rawValue: t) ?? .unknown
         self.version = v
-        self.payload = raw.count > 4 ? raw[4...] : Data()
+        self.payload = raw.count > 4 ? Data(raw[4...]) : Data()
     }
 }
 
@@ -387,7 +387,7 @@ struct LunaActivityTotals {
 
 // MARK: Button Press
 
-enum LunaButton: UInt8 {
+enum LunaWatchButton: UInt8 {
     case up     = 0
     case middle = 1
     case down   = 2
@@ -402,7 +402,7 @@ enum LunaButtonEvent: UInt8 {
 struct LunaButtonPress {
     let appId: Int32
     let watchfaceId: UInt8
-    let button: LunaButton
+    let button: LunaWatchButton
     let event: LunaButtonEvent
     let identifier: Int32
     let value: Int32
@@ -412,7 +412,7 @@ struct LunaButtonPress {
         let p = msg.payload
         appId       = Int32(bitPattern: UInt32(p[0]) | UInt32(p[1]) << 8 | UInt32(p[2]) << 16 | UInt32(p[3]) << 24)
         watchfaceId = p[4]
-        button      = LunaButton(rawValue: p[5]) ?? .middle
+        button      = LunaWatchButton(rawValue: p[5]) ?? .middle
         event       = LunaButtonEvent(rawValue: p[6]) ?? .press
         identifier  = Int32(bitPattern: UInt32(p[7]) | UInt32(p[8]) << 8 | UInt32(p[9]) << 16 | UInt32(p[10]) << 24)
         value       = Int32(bitPattern: UInt32(p[11]) | UInt32(p[12]) << 8 | UInt32(p[13]) << 16 | UInt32(p[14 < p.count ? 14 : p.count - 1]) << 24)
@@ -469,7 +469,7 @@ extension LunaMessage {
         p.append(elementId)
         p.append(UInt8(1))        // elementType TEXT
         p.appendLE(ttl)
-        p.appendLE(Int32(Int.random(in: 1..<Int32.max)))  // dataId
+        p.appendLE(Int32(Int.random(in: 1..<Int(Int32.max))))  // dataId
         p.append(UInt8(0))        // ttlType
         let bytes = Array(text.utf8.prefix(32))
         p.append(UInt8(bytes.count))
@@ -492,13 +492,56 @@ extension LunaMessage {
         return LunaMessage(type: .calendarEvents, version: 0, payload: p)
     }
 
+    // Sync goals to watch. Payload format mirrors Android SyncGoalsCommand:
+    // [count][goalType:u8 + value:i32 LE]...
+    // goalType: 0=steps, 1=calories, 2=distance(cm), 3=sleep(15-min buckets)
+    static func syncGoals(steps: Int? = nil,
+                          calories: Int? = nil,
+                          distanceCm: Int? = nil,
+                          sleepMinutes: Int? = nil) -> LunaMessage {
+        var goals: [(UInt8, Int32)] = []
+        if let steps { goals.append((0, Int32(steps))) }
+        if let calories { goals.append((1, Int32(calories))) }
+        if let distanceCm { goals.append((2, Int32(distanceCm))) }
+        if let sleepMinutes {
+            // Android multiplies sleep goal by 4 (15-minute slots).
+            goals.append((3, Int32(sleepMinutes * 4)))
+        }
+
+        var p = Data(capacity: 1 + goals.count * 5)
+        p.append(UInt8(goals.count))
+        for (type, value) in goals {
+            p.append(type)
+            p.appendLE(UInt32(bitPattern: value))
+        }
+        return LunaMessage(type: .goal, version: 0, payload: p)
+    }
+
+    // Dedicated "notifications mode" setting update (Android uses SettingsType 24).
+    // mode: 0=off, 1=show contents, 2=show alert only
+    static func syncNotificationMode(_ mode: UInt8) -> LunaMessage {
+        let clamped = min(mode, 2)
+        return .syncSettings([(24, clamped)])
+    }
+
     // VFTP: initiate a file transfer (phone → watch)
-    static func vftpPut(fileId: Int32, fileType: UInt8, data: Data, compressed: Bool = false) -> LunaMessage {
-        let realSize = UInt16(data.count)
+    // Payload:
+    // [msgType=1][realSize:u16][flags:u8][compressedSize:u16][fileType:u8][fileId:u32]
+    // flags bit0=compressed, bit1=force overwrite
+    static func vftpPut(fileId: Int32,
+                        fileType: UInt8,
+                        data: Data,
+                        compressed: Bool = false,
+                        force: Bool = true,
+                        uncompressedSize: UInt16? = nil) -> LunaMessage {
+        let realSize = uncompressedSize ?? UInt16(data.count)
         var p = Data(capacity: 8)
         p.append(UInt8(1))           // PUT
         p.appendLE(realSize)
-        p.append(compressed ? UInt8(1) : UInt8(0))  // flags
+        var flags: UInt8 = 0
+        if compressed { flags |= 1 }
+        if force { flags |= 2 }
+        p.append(flags)
         p.appendLE(realSize)         // compressedSize = realSize (uncompressed)
         p.append(fileType)
         p.appendLE(UInt32(bitPattern: fileId))
@@ -583,8 +626,4 @@ struct LunaNotification {
 
 private extension Data {
     static func += (lhs: inout Data, rhs: [UInt8]) { lhs.append(contentsOf: rhs) }
-    mutating func appendLE(_ v: UInt32) {
-        var le = v.littleEndian
-        append(contentsOf: Swift.withUnsafeBytes(of: &le, Array.init))
-    }
 }

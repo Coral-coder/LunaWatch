@@ -1,8 +1,11 @@
 import SwiftUI
 import PhotosUI
 
+// MARK: - Main Watch Tab
+
 struct WatchFaceView: View {
     @EnvironmentObject var ble: BLEManager
+    @EnvironmentObject var watchSync: WatchSyncManager
     @EnvironmentObject var faceManager: WatchFaceManager
     @EnvironmentObject var weather: WeatherManager
 
@@ -11,107 +14,141 @@ struct WatchFaceView: View {
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     private let accent = Color(red: 0.38, green: 0.49, blue: 1.0)
-    private let dark   = Color(red: 0.07, green: 0.07, blue: 0.10)
+    private let dark   = Color(red: 0.06, green: 0.06, blue: 0.09)
 
     var body: some View {
         NavigationStack {
             ZStack {
                 dark.ignoresSafeArea()
-                VStack(spacing: 20) {
-                    // Status bar
-                    HStack {
-                        Spacer()
-                        ConnectionBadge()
-                    }
-                    .padding(.horizontal, 20)
 
-                    // Clock preview
-                    ClockFaceView(
-                        mode: faceManager.settings.clockMode,
-                        invertDisplay: faceManager.settings.invertDisplay,
-                        backgroundPhotoData: faceManager.settings.backgroundPhotoData,
-                        weatherText: faceManager.settings.showWeather
-                            ? weather.condition?.watchText : nil,
-                        showDate: faceManager.settings.showDate,
-                        now: tick
-                    )
-                    .frame(width: 220, height: 220)
-                    .clipShape(RoundedRectangle(cornerRadius: 18))
-                    .shadow(color: accent.opacity(0.25), radius: 24)
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 24) {
 
-                    // Mode toggle
-                    Picker("Clock Mode", selection: $faceManager.settings.clockMode) {
-                        ForEach(ClockMode.allCases, id: \.self) { Text($0.rawValue).tag($0) }
-                    }
-                    .pickerStyle(.segmented)
-                    .padding(.horizontal, 40)
-
-                    // Action grid
-                    VStack(spacing: 10) {
+                        // ── Status strip ──
                         HStack(spacing: 10) {
-                            LunaButton(
-                                title: "SYNC WATCH",
-                                icon: "arrow.triangle.2.circlepath",
-                                color: accent,
-                                disabled: !ble.isConnected
-                            ) {
-                                let img = faceManager.renderFaceImage(
-                                    weatherText: weather.condition?.watchText)
-                                // Encode and transmit via BLE — protocol TBD
-                                _ = img
-                            }
-                            LunaButton(title: "SETTINGS", icon: "slider.horizontal.3", color: accent) {
-                                showSettings = true
+                            Circle()
+                                .fill(ble.isConnected ? Color.green : Color(white: 0.3))
+                                .frame(width: 8, height: 8)
+                                .shadow(color: ble.isConnected ? .green.opacity(0.8) : .clear, radius: 5)
+                            Text(ble.isConnected
+                                 ? (ble.connectedDevice?.name ?? "R33K0")
+                                 : ble.state.rawValue.uppercased())
+                                .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                                .foregroundColor(ble.isConnected ? .green : .secondary)
+                            Spacer()
+                            if let pct = watchSync.batteryPercentage {
+                                BatteryView(percentage: pct)
                             }
                         }
-                        HStack(spacing: 10) {
-                            if ble.isConnected {
-                                LunaButton(title: "DISCONNECT",
-                                           icon: "antenna.radiowaves.left.and.right.slash",
-                                           color: .red.opacity(0.8)) {
-                                    ble.disconnect()
-                                }
-                            } else {
-                                LunaButton(title: ble.state == .scanning ? "SCANNING…" : "SCAN",
-                                           icon: "antenna.radiowaves.left.and.right",
-                                           color: accent) {
-                                    ble.startScanning()
-                                }
+                        .padding(.horizontal, 20)
+                        .padding(.top, 4)
+
+                        // ── Round watch preview ──
+                        RoundWatchView(
+                            mode: faceManager.settings.clockMode,
+                            invertDisplay: faceManager.settings.invertDisplay,
+                            backgroundPhotoData: faceManager.settings.backgroundPhotoData,
+                            weatherText: faceManager.settings.showWeather ? weather.condition?.watchText : nil,
+                            showDate: faceManager.settings.showDate,
+                            now: tick
+                        )
+
+                        // ── Clock mode toggle ──
+                        Picker("Mode", selection: $faceManager.settings.clockMode) {
+                            ForEach(ClockMode.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+                        }
+                        .pickerStyle(.segmented)
+                        .padding(.horizontal, 32)
+
+                        // ── Sync status ──
+                        if ble.isConnected {
+                            Text(watchSync.syncStatus.label)
+                                .font(.system(size: 10, design: .monospaced))
+                                .foregroundColor(.secondary)
+                        }
+
+                        // ── Action buttons ──
+                        VStack(spacing: 10) {
+                            HStack(spacing: 10) {
+                                LunaActionButton(
+                                    title: watchSync.syncStatus == .syncing ? "SYNCING…" : "SYNC WATCH",
+                                    icon: "arrow.triangle.2.circlepath",
+                                    color: accent,
+                                    disabled: !ble.isConnected || watchSync.syncStatus == .syncing
+                                ) { watchSync.performInitialSync() }
+
+                                LunaActionButton(
+                                    title: "SETTINGS",
+                                    icon: "slider.horizontal.3",
+                                    color: accent
+                                ) { showSettings = true }
                             }
-                            if ble.isConnected {
-                                LunaButton(title: "BUZZ WATCH",
-                                           icon: "iphone.radiowaves.left.and.right",
-                                           color: .orange) {
-                                    ble.send(Data([0x01, 0x01]))
+
+                            HStack(spacing: 10) {
+                                if ble.isConnected {
+                                    LunaActionButton(
+                                        title: "DISCONNECT",
+                                        icon: "antenna.radiowaves.left.and.right.slash",
+                                        color: .red.opacity(0.9)
+                                    ) { ble.disconnect() }
+                                } else {
+                                    LunaActionButton(
+                                        title: ble.state == .scanning ? "SCANNING…" : "SCAN",
+                                        icon: "antenna.radiowaves.left.and.right",
+                                        color: accent,
+                                        disabled: ble.state == .scanning
+                                    ) { ble.startScanning() }
+                                }
+
+                                LunaActionButton(
+                                    title: "VIBRATE",
+                                    icon: "iphone.radiowaves.left.and.right",
+                                    color: .orange,
+                                    disabled: !ble.isConnected
+                                ) {
+                                    watchSync.sendNotification(
+                                        kind: .sms,
+                                        appName: "LunaWatch",
+                                        title: "Test",
+                                        message: "Buzz!"
+                                    )
                                 }
                             }
                         }
-                    }
-                    .padding(.horizontal, 20)
+                        .padding(.horizontal, 20)
 
-                    // Discovered devices
-                    if !ble.discoveredDevices.isEmpty && !ble.isConnected {
-                        DeviceListView()
-                    }
+                        // ── Device picker (shown while scanning / not connected) ──
+                        if !ble.discoveredDevices.isEmpty && !ble.isConnected {
+                            DeviceListView()
+                        }
 
-                    Spacer()
+                        // ── Watch info strip (when connected) ──
+                        if ble.isConnected, let info = watchSync.systemInfo {
+                            WatchInfoStrip(info: info)
+                                .padding(.horizontal, 20)
+                        }
+
+                        Spacer(minLength: 24)
+                    }
                 }
             }
             .navigationTitle("Luna Watch")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .sheet(isPresented: $showSettings) {
-                WatchFaceSettingsSheet()
+                SettingsView()
                     .environmentObject(faceManager)
+                    .environmentObject(watchSync)
+                    .environmentObject(ble)
             }
             .onReceive(timer) { t in tick = t }
         }
     }
 }
 
-// MARK: - Clock face SwiftUI component
+// MARK: - Round watch
 
-struct ClockFaceView: View {
+struct RoundWatchView: View {
     let mode: ClockMode
     let invertDisplay: Bool
     let backgroundPhotoData: Data?
@@ -119,24 +156,69 @@ struct ClockFaceView: View {
     let showDate: Bool
     let now: Date
 
+    private let accent = Color(red: 0.38, green: 0.49, blue: 1.0)
+
     var body: some View {
         ZStack {
-            Group {
-                if let data = backgroundPhotoData, let img = UIImage(data: data) {
-                    Image(uiImage: img).resizable().scaledToFill()
-                        .overlay(Color.black.opacity(0.45))
+            // Outer metallic bezel
+            Circle()
+                .fill(
+                    LinearGradient(
+                        colors: [Color(white: 0.28), Color(white: 0.14), Color(white: 0.22)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .frame(width: 244, height: 244)
+                .shadow(color: .black.opacity(0.6), radius: 20, y: 10)
+
+            // Inner bezel ring
+            Circle()
+                .stroke(
+                    LinearGradient(
+                        colors: [Color(white: 0.5), Color(white: 0.18)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 2
+                )
+                .frame(width: 232, height: 232)
+
+            // Watch face
+            ZStack {
+                // Background
+                Group {
+                    if let data = backgroundPhotoData, let img = UIImage(data: data) {
+                        Image(uiImage: img).resizable().scaledToFill()
+                            .overlay(Color.black.opacity(0.45))
+                    } else {
+                        (invertDisplay ? Color.white : Color(red: 0.04, green: 0.04, blue: 0.06))
+                    }
+                }
+                .clipShape(Circle())
+
+                // Clock content
+                if mode == .digital {
+                    DigitalClockContent(invertDisplay: invertDisplay, now: now,
+                                        weatherText: weatherText, showDate: showDate)
                 } else {
-                    invertDisplay ? Color.white : Color.black
+                    AnalogClockContent(invertDisplay: invertDisplay, now: now,
+                                       weatherText: weatherText)
                 }
             }
+            .frame(width: 220, height: 220)
+            .clipShape(Circle())
 
-            if mode == .digital {
-                DigitalClockContent(invertDisplay: invertDisplay, now: now,
-                                    weatherText: weatherText, showDate: showDate)
-            } else {
-                AnalogClockContent(invertDisplay: invertDisplay, now: now,
-                                   weatherText: weatherText)
-            }
+            // Crown
+            Capsule()
+                .fill(
+                    LinearGradient(
+                        colors: [Color(white: 0.4), Color(white: 0.2)],
+                        startPoint: .top, endPoint: .bottom
+                    )
+                )
+                .frame(width: 10, height: 28)
+                .offset(x: 122, y: -18)
         }
     }
 }
@@ -160,19 +242,19 @@ struct DigitalClockContent: View {
     }
 
     var body: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 4) {
             Text(timeString)
-                .font(.system(size: 56, weight: .thin, design: .monospaced))
+                .font(.system(size: 52, weight: .thin, design: .monospaced))
                 .foregroundColor(fg)
             if showDate {
                 Text(dateString)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(fg.opacity(0.7))
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(fg.opacity(0.65))
             }
             if let wt = weatherText {
                 Text(wt)
-                    .font(.system(size: 12))
-                    .foregroundColor(fg.opacity(0.5))
+                    .font(.system(size: 11))
+                    .foregroundColor(fg.opacity(0.45))
             }
         }
     }
@@ -200,28 +282,37 @@ struct AnalogClockContent: View {
             let cx     = geo.size.width  / 2
             let cy     = geo.size.height / 2
             let center = CGPoint(x: cx, y: cy)
-            let r      = sz / 2 * 0.84
+            let r      = sz / 2 * 0.86
             let (h, m, s) = components
 
             ZStack {
                 ForEach(0..<60, id: \.self) { i in
-                    TickMark(center: center, radius: r, angleDeg: Double(i) * 6 - 90,
-                             length: i % 5 == 0 ? r * 0.13 : r * 0.07,
-                             width: i % 5 == 0 ? 2.5 : 1, color: fg)
+                    TickMark(center: center, radius: r,
+                             angleDeg: Double(i) * 6 - 90,
+                             length: i % 5 == 0 ? r * 0.12 : r * 0.06,
+                             width:  i % 5 == 0 ? 2.5 : 1.0, color: fg)
                 }
                 HandView(center: center, angleDeg: (h + m / 60) * 30 - 90,
-                         length: r * 0.50, width: 5, color: fg)
+                         length: r * 0.50, width: 5.5, color: fg)
                 HandView(center: center, angleDeg: (m + s / 60) * 6 - 90,
                          length: r * 0.72, width: 3, color: fg)
                 HandView(center: center, angleDeg: s * 6 - 90,
                          length: r * 0.80, width: 1.5, color: .red)
-                Circle().fill(fg).frame(width: 9, height: 9).position(center)
+                // Centre cap
+                Circle()
+                    .fill(fg)
+                    .frame(width: 10, height: 10)
+                    .position(center)
+                Circle()
+                    .fill(Color.red)
+                    .frame(width: 5, height: 5)
+                    .position(center)
 
                 if let wt = weatherText {
                     Text(wt)
-                        .font(.system(size: 11))
-                        .foregroundColor(fg.opacity(0.6))
-                        .position(x: cx, y: cy + r * 0.62)
+                        .font(.system(size: 10))
+                        .foregroundColor(fg.opacity(0.55))
+                        .position(x: cx, y: cy + r * 0.58)
                 }
             }
         }
@@ -229,43 +320,59 @@ struct AnalogClockContent: View {
 }
 
 struct TickMark: View {
-    let center: CGPoint
-    let radius: CGFloat
-    let angleDeg: Double
-    let length: CGFloat
-    let width: CGFloat
-    let color: Color
-
+    let center: CGPoint; let radius: CGFloat; let angleDeg: Double
+    let length: CGFloat; let width: CGFloat; let color: Color
     var body: some View {
         let rad = angleDeg * .pi / 180
-        let p1  = CGPoint(x: center.x + CGFloat(cos(rad)) * (radius - length),
-                          y: center.y + CGFloat(sin(rad)) * (radius - length))
-        let p2  = CGPoint(x: center.x + CGFloat(cos(rad)) * radius,
-                          y: center.y + CGFloat(sin(rad)) * radius)
+        let p1  = CGPoint(x: center.x + cos(rad) * (radius - length),
+                          y: center.y + sin(rad) * (radius - length))
+        let p2  = CGPoint(x: center.x + cos(rad) * radius,
+                          y: center.y + sin(rad) * radius)
         return Path { p in p.move(to: p1); p.addLine(to: p2) }
             .stroke(color, lineWidth: width)
     }
 }
 
 struct HandView: View {
-    let center: CGPoint
-    let angleDeg: Double
-    let length: CGFloat
-    let width: CGFloat
-    let color: Color
-
+    let center: CGPoint; let angleDeg: Double
+    let length: CGFloat; let width: CGFloat; let color: Color
     var body: some View {
         let rad  = angleDeg * .pi / 180
-        let tip  = CGPoint(x: center.x + CGFloat(cos(rad)) * length,
-                           y: center.y + CGFloat(sin(rad)) * length)
-        let tail = CGPoint(x: center.x - CGFloat(cos(rad)) * length * 0.18,
-                           y: center.y - CGFloat(sin(rad)) * length * 0.18)
+        let tip  = CGPoint(x: center.x + cos(rad) * length,
+                           y: center.y + sin(rad) * length)
+        let tail = CGPoint(x: center.x - cos(rad) * length * 0.18,
+                           y: center.y - sin(rad) * length * 0.18)
         return Path { p in p.move(to: tail); p.addLine(to: tip) }
             .stroke(color, style: StrokeStyle(lineWidth: width, lineCap: .round))
     }
 }
 
-// MARK: - Shared sub-components
+// MARK: - Watch info strip
+
+struct WatchInfoStrip: View {
+    let info: LunaSystemInfo
+    var body: some View {
+        HStack(spacing: 0) {
+            infoCell(label: "KERNEL", value: info.kernelVersion)
+            Divider().frame(height: 28).background(Color.white.opacity(0.1))
+            infoCell(label: "BOOT",   value: info.bootVersion)
+        }
+        .padding(.vertical, 10)
+        .frame(maxWidth: .infinity)
+        .background(Color.white.opacity(0.04))
+        .cornerRadius(10)
+    }
+    @ViewBuilder
+    private func infoCell(label: String, value: String) -> some View {
+        VStack(spacing: 2) {
+            Text(label).font(.system(size: 8, weight: .bold, design: .monospaced)).foregroundColor(.secondary)
+            Text(value).font(.system(size: 13, weight: .medium, design: .monospaced))
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
+// MARK: - Shared components
 
 struct ConnectionBadge: View {
     @EnvironmentObject var ble: BLEManager
@@ -285,24 +392,45 @@ struct ConnectionBadge: View {
     }
 }
 
-struct LunaButton: View {
-    let title: String
-    let icon: String
-    let color: Color
+struct BatteryView: View {
+    let percentage: Int
+    private var color: Color { percentage > 50 ? .green : percentage > 20 ? .orange : .red }
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: batteryIcon).font(.system(size: 13)).foregroundColor(color)
+            Text("\(percentage)%")
+                .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                .foregroundColor(color)
+        }
+        .padding(.horizontal, 8).padding(.vertical, 4)
+        .background(color.opacity(0.1))
+        .cornerRadius(8)
+    }
+    private var batteryIcon: String {
+        switch percentage {
+        case 75...: return "battery.100"
+        case 50...: return "battery.75"
+        case 25...: return "battery.25"
+        default:    return "battery.0"
+        }
+    }
+}
+
+struct LunaActionButton: View {
+    let title: String; let icon: String; let color: Color
     var disabled: Bool = false
     let action: () -> Void
-
     var body: some View {
         Button(action: action) {
             HStack(spacing: 8) {
-                Image(systemName: icon).font(.system(size: 15))
+                Image(systemName: icon).font(.system(size: 14))
                 Text(title).font(.system(size: 11, weight: .semibold, design: .monospaced))
             }
             .frame(maxWidth: .infinity).frame(height: 48)
-            .background(disabled ? Color.white.opacity(0.05) : color.opacity(0.15))
-            .cornerRadius(10)
-            .overlay(RoundedRectangle(cornerRadius: 10)
-                .stroke(disabled ? Color.white.opacity(0.1) : color.opacity(0.4), lineWidth: 1))
+            .background(disabled ? Color.white.opacity(0.04) : color.opacity(0.13))
+            .cornerRadius(12)
+            .overlay(RoundedRectangle(cornerRadius: 12)
+                .stroke(disabled ? Color.white.opacity(0.08) : color.opacity(0.35), lineWidth: 1))
             .foregroundColor(disabled ? .gray : color)
         }
         .disabled(disabled)
@@ -312,107 +440,34 @@ struct LunaButton: View {
 struct DeviceListView: View {
     @EnvironmentObject var ble: BLEManager
     private let accent = Color(red: 0.38, green: 0.49, blue: 1.0)
-
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text("NEARBY LUNA DEVICES")
+        VStack(alignment: .leading, spacing: 8) {
+            Text("NEARBY DEVICES")
                 .font(.system(size: 9, weight: .bold, design: .monospaced))
                 .foregroundColor(.secondary)
                 .padding(.horizontal, 20)
             ForEach(ble.discoveredDevices, id: \.identifier) { dev in
                 Button { ble.connect(dev) } label: {
-                    HStack {
-                        Image(systemName: "applewatch").foregroundColor(accent)
+                    HStack(spacing: 14) {
+                        Image(systemName: "applewatch")
+                            .font(.system(size: 20))
+                            .foregroundColor(accent)
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(dev.name ?? "Luna Watch")
-                                .font(.system(size: 13, weight: .semibold))
-                            Text(dev.identifier.uuidString.prefix(8))
+                            Text(dev.name ?? "Unknown Device")
+                                .font(.system(size: 14, weight: .semibold))
+                            Text(dev.identifier.uuidString.prefix(18))
                                 .font(.system(size: 9, design: .monospaced))
                                 .foregroundColor(.secondary)
                         }
                         Spacer()
                         Image(systemName: "chevron.right").foregroundColor(.secondary)
                     }
-                    .padding()
+                    .padding(14)
                     .background(Color.white.opacity(0.05))
-                    .cornerRadius(10)
+                    .cornerRadius(12)
                 }
                 .foregroundColor(.primary)
                 .padding(.horizontal, 20)
-            }
-        }
-    }
-}
-
-// MARK: - Settings sheet
-
-struct WatchFaceSettingsSheet: View {
-    @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var faceManager: WatchFaceManager
-    @State private var selectedPhoto: PhotosPickerItem?
-    private let accent = Color(red: 0.38, green: 0.49, blue: 1.0)
-
-    var body: some View {
-        NavigationStack {
-            Form {
-                Section("CLOCK STYLE") {
-                    Picker("Mode", selection: $faceManager.settings.clockMode) {
-                        ForEach(ClockMode.allCases, id: \.self) { Text($0.rawValue).tag($0) }
-                    }
-                    .pickerStyle(.segmented)
-                    .listRowBackground(Color.white.opacity(0.05))
-                    Toggle("Invert Display", isOn: $faceManager.settings.invertDisplay)
-                        .listRowBackground(Color.white.opacity(0.05))
-                }
-
-                Section("OVERLAYS") {
-                    Toggle("Show Weather", isOn: $faceManager.settings.showWeather)
-                    Toggle("Show Date",    isOn: $faceManager.settings.showDate)
-                }
-                .listRowBackground(Color.white.opacity(0.05))
-
-                Section("BACKGROUND PHOTO") {
-                    PhotosPicker(selection: $selectedPhoto, matching: .images) {
-                        Label(
-                            faceManager.settings.backgroundPhotoData != nil
-                                ? "Change Photo" : "Set Background Photo",
-                            systemImage: "photo.on.rectangle.angled"
-                        )
-                        .foregroundColor(accent)
-                    }
-                    .onChange(of: selectedPhoto) { item in
-                        Task {
-                            if let data = try? await item?.loadTransferable(type: Data.self) {
-                                faceManager.settings.backgroundPhotoData = data
-                            }
-                        }
-                    }
-                    .listRowBackground(Color.white.opacity(0.05))
-
-                    if let data = faceManager.settings.backgroundPhotoData,
-                       let img = UIImage(data: data) {
-                        Image(uiImage: img)
-                            .resizable().scaledToFill()
-                            .frame(height: 120).clipped()
-                            .cornerRadius(8)
-                            .listRowBackground(Color.clear)
-                    }
-
-                    if faceManager.settings.backgroundPhotoData != nil {
-                        Button("Remove Photo", role: .destructive) {
-                            faceManager.settings.backgroundPhotoData = nil
-                        }
-                        .listRowBackground(Color.white.opacity(0.05))
-                    }
-                }
-            }
-            .scrollContentBackground(.hidden)
-            .navigationTitle("Watch Settings")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }.foregroundColor(accent)
-                }
             }
         }
     }

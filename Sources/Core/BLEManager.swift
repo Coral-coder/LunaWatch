@@ -114,6 +114,9 @@ class BLEManager: NSObject, ObservableObject, CBCentralManagerDelegate, CBPeriph
     private let unframer = LunaUnframer()
     private static let logLimit = 400
 
+    /// Injected by the app; receives every decoded LunaMessage and lifecycle events.
+    var watchSync: WatchSyncManager?
+
     override init() {
         super.init()
         central = CBCentralManager(delegate: self, queue: nil)
@@ -198,7 +201,29 @@ class BLEManager: NSObject, ObservableObject, CBCentralManagerDelegate, CBPeriph
 
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         log(.info, nil, nil, "BT state → \(central.state.rawValue)")
-        if central.state == .poweredOn { startScanning() }
+        guard central.state == .poweredOn else { return }
+        // 1. Try to grab the watch if iOS already has it connected (no advertising needed).
+        let lunaServices = [LunaGATT.serviceUUID, LunaGATT.service2UUID]
+        let already = central.retrieveConnectedPeripherals(withServices: lunaServices)
+        if let match = already.first {
+            log(.info, nil, nil, "Already connected in OS — attaching to \(match.name ?? match.identifier.uuidString)")
+            discoveredDevices = [match]
+            connect(match)
+            return
+        }
+        // 2. Try to reconnect a previously paired watch by saved UUID.
+        if let saved = UserDefaults.standard.string(forKey: "luna.peripheral.uuid"),
+           let uuid  = UUID(uuidString: saved) {
+            let known = central.retrievePeripherals(withIdentifiers: [uuid])
+            if let p = known.first {
+                log(.info, nil, nil, "Re-connecting saved peripheral \(p.name ?? saved)")
+                discoveredDevices = [p]
+                connect(p)
+                return
+            }
+        }
+        // 3. Fall back to active scan.
+        startScanning()
     }
 
     func centralManager(_ central: CBCentralManager,
@@ -224,7 +249,10 @@ class BLEManager: NSObject, ObservableObject, CBCentralManagerDelegate, CBPeriph
         peripheral.delegate = self
         peripheral.discoverServices(nil)
         peripheral.readRSSI()
+        // Remember this peripheral so we can reconnect without scanning next launch.
+        UserDefaults.standard.set(peripheral.identifier.uuidString, forKey: "luna.peripheral.uuid")
         log(.info, nil, nil, "Connected – discovering all services…")
+        watchSync?.onConnect()
     }
 
     func centralManager(_ central: CBCentralManager,
@@ -241,6 +269,7 @@ class BLEManager: NSObject, ObservableObject, CBCentralManagerDelegate, CBPeriph
         state = .disconnected
         unframer.reset()
         log(.info, nil, nil, "Disconnected")
+        watchSync?.onDisconnect()
     }
 
     // MARK: - CBPeripheralDelegate
@@ -283,13 +312,19 @@ class BLEManager: NSObject, ObservableObject, CBCentralManagerDelegate, CBPeriph
         log(.rx, characteristic.uuid, data, "")
         updateLastValue(uuid: characteristic.uuid, data: data)
 
-        // Reassemble framed DataMessages from the DATA RX channel
+        // DATA RX (9e3b0002) — reassemble framed messages and dispatch
         if characteristic.uuid == LunaGATT.notifyCharUUID {
             if let msg = unframer.feed(data) {
                 let desc = "← LunaMsg type=\(msg.type) v=\(msg.version) payload=\(msg.payload.map { String(format: "%02X", $0) }.joined(separator: " "))"
                 log(.info, characteristic.uuid, nil, desc)
                 DispatchQueue.main.async { self.lastLunaMessage = msg }
+                watchSync?.handle(msg)
             }
+        }
+
+        // BLE_SHIELD_RX (81A50001) — notification detail requests from watch
+        if characteristic.uuid == LunaGATT.indicateCharUUID {
+            watchSync?.handleIndicateData(data)
         }
     }
 

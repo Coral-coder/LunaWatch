@@ -2,6 +2,7 @@ import SwiftUI
 
 struct HealthView: View {
     @EnvironmentObject var health: HealthKitManager
+    @EnvironmentObject var watchSync: WatchSyncManager
     private let accent = Color(red: 0.38, green: 0.49, blue: 1.0)
     private let dark   = Color(red: 0.07, green: 0.07, blue: 0.10)
 
@@ -14,6 +15,10 @@ struct HealthView: View {
                 } else {
                     ScrollView {
                         VStack(spacing: 14) {
+                            // Watch sensor data card (only shown when connected + data received)
+                            if watchSync.todaySteps > 0 {
+                                WatchActivityCard()
+                            }
                             StepRingCard()
                             WeeklyStepsCard()
                             SleepCard()
@@ -64,6 +69,75 @@ struct HealthAuthView: View {
 }
 
 // MARK: - Step ring
+
+// MARK: - Watch sensor data card
+
+struct WatchActivityCard: View {
+    @EnvironmentObject var watchSync: WatchSyncManager
+    private let accent = Color(red: 0.38, green: 0.49, blue: 1.0)
+    private let green  = Color(red: 0.2, green: 0.9, blue: 0.5)
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Image(systemName: "applewatch")
+                    .foregroundColor(accent)
+                Text("LUNA WATCH TODAY")
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundColor(.secondary)
+                Spacer()
+                if let info = watchSync.systemInfo {
+                    Text("fw \(info.kernelVersion)")
+                        .font(.system(size: 9, design: .monospaced))
+                        .foregroundColor(.secondary)
+                }
+            }
+
+            HStack(spacing: 0) {
+                watchMetric(value: "\(watchSync.todaySteps)",
+                            label: "STEPS", icon: "figure.walk", color: green)
+                Divider().background(Color.white.opacity(0.1)).frame(height: 44)
+                watchMetric(value: "\(watchSync.todayCalories)",
+                            label: "KCAL", icon: "flame.fill", color: .orange)
+                Divider().background(Color.white.opacity(0.1)).frame(height: 44)
+                watchMetric(value: String(format: "%.2f", watchSync.todayDistanceKm),
+                            label: "KM", icon: "map.fill", color: accent)
+                if watchSync.todaySleepMinutes > 0 {
+                    Divider().background(Color.white.opacity(0.1)).frame(height: 44)
+                    watchMetric(value: sleepString,
+                                label: "SLEEP", icon: "moon.fill", color: .purple)
+                }
+            }
+        }
+        .padding(16)
+        .background(Color.white.opacity(0.05))
+        .cornerRadius(16)
+        .overlay(RoundedRectangle(cornerRadius: 16)
+            .stroke(accent.opacity(0.2), lineWidth: 1))
+    }
+
+    private var sleepString: String {
+        let h = watchSync.todaySleepMinutes / 60
+        let m = watchSync.todaySleepMinutes % 60
+        return h > 0 ? "\(h)h\(m)m" : "\(m)m"
+    }
+
+    @ViewBuilder
+    private func watchMetric(value: String, label: String, icon: String, color: Color) -> some View {
+        VStack(spacing: 4) {
+            Image(systemName: icon).font(.system(size: 12)).foregroundColor(color)
+            Text(value)
+                .font(.system(size: 18, weight: .semibold, design: .monospaced))
+                .foregroundColor(.white)
+            Text(label)
+                .font(.system(size: 9, weight: .bold, design: .monospaced))
+                .foregroundColor(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
+// MARK: - HealthKit cards
 
 struct StepRingCard: View {
     @EnvironmentObject var health: HealthKitManager

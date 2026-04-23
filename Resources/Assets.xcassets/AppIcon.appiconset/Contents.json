@@ -1,10 +1,10 @@
 {
   "images" : [
     {
+      "filename" : "luna_watch_icon_1776944544410.jpg",
       "idiom" : "universal",
       "platform" : "ios",
-      "size" : "1024x1024",
-      "filename" : "icon-1024.png"
+      "size" : "1024x1024"
     }
   ],
   "info" : {
