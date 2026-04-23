@@ -75,10 +75,10 @@ final class LunaSettings: ObservableObject {
                           : !ud.bool(forKey: "luna.disp.imperial")
         showSecondHand  = ud.object(forKey: "luna.disp.seconds")   == nil ? true
                           : ud.bool(forKey: "luna.disp.seconds")
-        backlightLevel  = ud.object(forKey: "luna.disp.backlight") == nil ? 3
-                          : ud.integer(forKey: "luna.disp.backlight")
+        backlightLevel  = ud.object(forKey: "luna.disp.backlight") == nil ? 1
+                          : ud.integer(forKey: "luna.disp.backlight")   // 0–2 (watch max)
         backlightTimeout = ud.object(forKey: "luna.disp.bltimeout") == nil ? 5
-                          : ud.integer(forKey: "luna.disp.bltimeout")
+                          : ud.integer(forKey: "luna.disp.bltimeout")   // seconds
         invertDisplay   = ud.bool(forKey: "luna.disp.invert")
 
         glanceMode      = ud.object(forKey: "luna.pref.glance")        == nil ? true
@@ -317,27 +317,36 @@ struct SettingsView: View {
                 HStack {
                     Text("Backlight Level")
                     Spacer()
-                    Text("\(settings.backlightLevel)")
+                    // Watch supports exactly 3 levels: 0 = Low, 1 = Medium, 2 = High
+                    Text(["Low", "Medium", "High"][max(0, min(settings.backlightLevel, 2))])
                         .foregroundColor(accent)
                         .font(.system(.body, design: .monospaced))
                 }
                 Slider(value: Binding(
                            get: { Double(settings.backlightLevel) },
                            set: { settings.backlightLevel = Int($0) }),
-                       in: 1...5, step: 1)
+                       in: 0...2, step: 1)
                     .tint(accent)
                     .onChange(of: settings.backlightLevel) { _ in
                         settings.persistDisplay()
                         pushWatchSettings()
                     }
+                HStack {
+                    Text("Low").font(.caption2).foregroundColor(.secondary)
+                    Spacer()
+                    Text("Medium").font(.caption2).foregroundColor(.secondary)
+                    Spacer()
+                    Text("High").font(.caption2).foregroundColor(.secondary)
+                }
             }
 
+            // Timeout values match Android BACKLIGHT_TIMEOUT_DURATION_* constants (seconds)
             Picker("Backlight Timeout", selection: $settings.backlightTimeout) {
-                Text("3 sec").tag(3)
+                Text("2 sec").tag(2)
                 Text("5 sec").tag(5)
                 Text("10 sec").tag(10)
                 Text("20 sec").tag(20)
-                Text("Always On").tag(0)
+                Text("30 sec").tag(30)
             }
             .onChange(of: settings.backlightTimeout) { _ in
                 settings.persistDisplay()
@@ -517,12 +526,13 @@ struct SettingsView: View {
         guard isConnected else { return }
         watchSync.pushWatchName(settings.userName)
         watchSync.syncSettings(
-            hourMode24h:    settings.hour24Mode,
-            metricUnits:    settings.metricUnits,
-            glance:         settings.glanceMode,
-            dnd:            settings.dndEnabled,
-            backlightLevel: UInt8(min(settings.backlightLevel, 5)),
-            showSecondHand: settings.showSecondHand
+            hourMode24h:      settings.hour24Mode,
+            metricUnits:      settings.metricUnits,
+            glance:           settings.glanceMode,
+            dnd:              settings.dndEnabled,
+            backlightLevel:   UInt8(max(0, min(settings.backlightLevel, 2))), // clamp 0–2
+            backlightTimeout: UInt8(settings.backlightTimeout),               // seconds
+            showSecondHand:   settings.showSecondHand
         )
         watchSync.syncNotificationMode(settings.notificationsMode)
     }

@@ -231,20 +231,30 @@ class WatchSyncManager: ObservableObject {
     // MARK: - Settings sync helpers
 
     func syncSettings(
-        hourMode24h: Bool   = true,
-        metricUnits: Bool   = true,
-        glance: Bool        = true,
-        dnd: Bool           = false,
-        backlightLevel: UInt8 = 3,
-        showSecondHand: Bool  = true
+        hourMode24h: Bool    = true,
+        metricUnits: Bool    = true,
+        glance: Bool         = true,
+        dnd: Bool            = false,
+        backlightLevel: UInt8  = 1,   // 0–2 (watch hardware max = 2)
+        backlightTimeout: UInt8 = 5,  // seconds: 2 | 5 | 10 | 20 | 30; 0 = always-on
+        showSecondHand: Bool = true
     ) {
         guard let ble = ble else { return }
+        // The watch uses setting types:
+        //  6 = unit system (0=metric, 1=imperial)
+        //  7 = hour mode   (0=24h, 1=12h)
+        // 14 = DND         (1=on)
+        // 16 = glance/raise-to-wake (1=on)
+        // 18 = backlight intensity  (0–2)
+        // 19 = backlight timeout    (seconds, per Android BACKLIGHT_TIMEOUT_DURATION_*)
+        // 20 = show second hand     (1=on)
         let settings: [(UInt8, UInt8)] = [
-            (7,  hourMode24h   ? 0 : 1),
-            (6,  metricUnits   ? 0 : 1),
-            (16, glance        ? 1 : 0),
-            (14, dnd           ? 1 : 0),
-            (18, backlightLevel),
+            (7,  hourMode24h    ? 0 : 1),
+            (6,  metricUnits    ? 0 : 1),
+            (16, glance         ? 1 : 0),
+            (14, dnd            ? 1 : 0),
+            (18, min(backlightLevel, 2)),   // clamp to 0–2
+            (19, backlightTimeout),
             (20, showSecondHand ? 1 : 0),
         ]
         ble.sendMessage(.syncSettings(settings))
