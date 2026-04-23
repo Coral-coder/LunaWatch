@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+
+	<!-- Bluetooth -->
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Luna Watch needs Bluetooth to connect to and sync with your Vector Luna watch.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Luna Watch needs Bluetooth to connect to your watch.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>bluetooth-central</string>
+	</array>
+
+	<!-- Location (for weather) -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Luna Watch uses your location to display local weather conditions on your watch face.</string>
+
+	<!-- Health -->
+	<key>NSHealthShareUsageDescription</key>
+	<string>Luna Watch reads your step count and sleep data to display on your watch and in the app.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Luna Watch can write step count and sleep sessions collected from your watch to Apple Health.</string>
+
+	<!-- Photo library (for background photo) -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Luna Watch lets you set a photo from your library as the watch face background.</string>
+
+	<!-- UI -->
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+	</dict>
+	<key>UILaunchScreen</key>
+	<dict/>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>UIRequiresFullScreen</key>
+	<true/>
+</dict>
+</plist>

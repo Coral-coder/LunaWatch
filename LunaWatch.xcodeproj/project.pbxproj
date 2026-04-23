@@ -1,0 +1,347 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A100010100000000000001BB /* LunaWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100010100000000000001FF /* LunaWatchApp.swift */; };
+		A100020200000000000002BB /* BLEManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100020200000000000002FF /* BLEManager.swift */; };
+		A100030300000000000003BB /* WatchFaceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100030300000000000003FF /* WatchFaceManager.swift */; };
+		A100040400000000000004BB /* WeatherManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100040400000000000004FF /* WeatherManager.swift */; };
+		A100050500000000000005BB /* StocksManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100050500000000000005FF /* StocksManager.swift */; };
+		A100060600000000000006BB /* NewsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100060600000000000006FF /* NewsManager.swift */; };
+		A100070700000000000007BB /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100070700000000000007FF /* HealthKitManager.swift */; };
+		A100080800000000000008BB /* WatchFaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100080800000000000008FF /* WatchFaceView.swift */; };
+		A100090900000000000009BB /* HealthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100090900000000000009FF /* HealthView.swift */; };
+		A1000A0A00000000000010BB /* DataFeedsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000A0A00000000000010FF /* DataFeedsView.swift */; };
+		A1000B0B00000000000011BB /* NotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000B0B00000000000011FF /* NotificationsView.swift */; };
+		A1000C0C00000000000012BB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000C0C00000000000012FF /* Assets.xcassets */; };
+		A100131300000000000016BB /* LunaProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100131300000000000016FF /* LunaProtocol.swift */; };
+		A100141400000000000017BB /* BLEDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100141400000000000017FF /* BLEDebugView.swift */; };
+		B100010100000000000001BB /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B100010100000000000001FF /* HealthKit.framework */; };
+		B100020200000000000002BB /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B100020200000000000002FF /* CoreLocation.framework */; };
+		B100030300000000000003BB /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B100030300000000000003FF /* CoreBluetooth.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A100010100000000000001FF /* LunaWatchApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LunaWatchApp.swift; path = Sources/App/LunaWatchApp.swift; sourceTree = "<group>"; };
+		A100020200000000000002FF /* BLEManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BLEManager.swift; path = Sources/Core/BLEManager.swift; sourceTree = "<group>"; };
+		A100030300000000000003FF /* WatchFaceManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchFaceManager.swift; path = Sources/Core/WatchFaceManager.swift; sourceTree = "<group>"; };
+		A100040400000000000004FF /* WeatherManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WeatherManager.swift; path = Sources/Core/WeatherManager.swift; sourceTree = "<group>"; };
+		A100050500000000000005FF /* StocksManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StocksManager.swift; path = Sources/Core/StocksManager.swift; sourceTree = "<group>"; };
+		A100060600000000000006FF /* NewsManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NewsManager.swift; path = Sources/Core/NewsManager.swift; sourceTree = "<group>"; };
+		A100070700000000000007FF /* HealthKitManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HealthKitManager.swift; path = Sources/Core/HealthKitManager.swift; sourceTree = "<group>"; };
+		A100080800000000000008FF /* WatchFaceView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchFaceView.swift; path = Sources/UI/WatchFaceView.swift; sourceTree = "<group>"; };
+		A100090900000000000009FF /* HealthView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HealthView.swift; path = Sources/UI/HealthView.swift; sourceTree = "<group>"; };
+		A1000A0A00000000000010FF /* DataFeedsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DataFeedsView.swift; path = Sources/UI/DataFeedsView.swift; sourceTree = "<group>"; };
+		A1000B0B00000000000011FF /* NotificationsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NotificationsView.swift; path = Sources/UI/NotificationsView.swift; sourceTree = "<group>"; };
+		A1000C0C00000000000012FF /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = Resources/Assets.xcassets; sourceTree = "<group>"; };
+		A100131300000000000016FF /* LunaProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LunaProtocol.swift; path = Sources/Core/LunaProtocol.swift; sourceTree = "<group>"; };
+		A100141400000000000017FF /* BLEDebugView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BLEDebugView.swift; path = Sources/UI/BLEDebugView.swift; sourceTree = "<group>"; };
+		A1000D0D00000000000013FF /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = Info.plist; path = Resources/Info.plist; sourceTree = "<group>"; };
+		A1000E0E00000000000014FF /* LunaWatch.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; name = LunaWatch.entitlements; path = Resources/LunaWatch.entitlements; sourceTree = "<group>"; };
+		A1000F0F00000000000015FF /* LunaWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LunaWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B100010100000000000001FF /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/HealthKit.framework; sourceTree = DEVELOPER_DIR; };
+		B100020200000000000002FF /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/CoreLocation.framework; sourceTree = DEVELOPER_DIR; };
+		B100030300000000000003FF /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/CoreBluetooth.framework; sourceTree = DEVELOPER_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		EE000002000000000000002A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B100010100000000000001BB /* HealthKit.framework in Frameworks */,
+				B100020200000000000002BB /* CoreLocation.framework in Frameworks */,
+				B100030300000000000003BB /* CoreBluetooth.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		DD000001000000000000001A = {
+			isa = PBXGroup;
+			children = (
+				DD000002000000000000002A /* Products */,
+				DD000008000000000000008A /* Frameworks */,
+				DD000003000000000000003A /* Sources */,
+				A1000C0C00000000000012FF /* Assets.xcassets */,
+				A1000D0D00000000000013FF /* Info.plist */,
+				A1000E0E00000000000014FF /* LunaWatch.entitlements */,
+			);
+			sourceTree = "<group>";
+		};
+		DD000002000000000000002A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A1000F0F00000000000015FF /* LunaWatch.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DD000003000000000000003A /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				DD000004000000000000004A /* App */,
+				DD000005000000000000005A /* Core */,
+				DD000006000000000000006A /* UI */,
+			);
+			name = Sources;
+			sourceTree = "<group>";
+		};
+		DD000004000000000000004A /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A100010100000000000001FF /* LunaWatchApp.swift */,
+			);
+			name = App;
+			sourceTree = "<group>";
+		};
+		DD000005000000000000005A /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				A100020200000000000002FF /* BLEManager.swift */,
+				A100030300000000000003FF /* WatchFaceManager.swift */,
+				A100040400000000000004FF /* WeatherManager.swift */,
+				A100050500000000000005FF /* StocksManager.swift */,
+				A100060600000000000006FF /* NewsManager.swift */,
+				A100070700000000000007FF /* HealthKitManager.swift */,
+				A100131300000000000016FF /* LunaProtocol.swift */,
+			);
+			name = Core;
+			sourceTree = "<group>";
+		};
+		DD000006000000000000006A /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				A100080800000000000008FF /* WatchFaceView.swift */,
+				A100090900000000000009FF /* HealthView.swift */,
+				A1000A0A00000000000010FF /* DataFeedsView.swift */,
+				A1000B0B00000000000011FF /* NotificationsView.swift */,
+				A100141400000000000017FF /* BLEDebugView.swift */,
+			);
+			name = UI;
+			sourceTree = "<group>";
+		};
+		DD000008000000000000008A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				DD000009000000000000009A /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		DD000009000000000000009A /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				B100010100000000000001FF /* HealthKit.framework */,
+				B100020200000000000002FF /* CoreLocation.framework */,
+				B100030300000000000003FF /* CoreBluetooth.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		BB000001000000000000001A /* LunaWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FF000002000000000000002A /* Build configuration list for PBXNativeTarget "LunaWatch" */;
+			buildPhases = (
+				EE000001000000000000001A /* Sources */,
+				EE000002000000000000002A /* Frameworks */,
+				EE000003000000000000003A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LunaWatch;
+			productName = LunaWatch;
+			productReference = A1000F0F00000000000015FF /* LunaWatch.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AA000001000000000000001A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+			};
+			buildConfigurationList = FF000001000000000000001A /* Build configuration list for PBXProject "LunaWatch" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = DD000001000000000000001A;
+			productRefGroup = DD000002000000000000002A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				BB000001000000000000001A /* LunaWatch */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		EE000003000000000000003A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1000C0C00000000000012BB /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		EE000001000000000000001A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A100010100000000000001BB /* LunaWatchApp.swift in Sources */,
+				A100020200000000000002BB /* BLEManager.swift in Sources */,
+				A100030300000000000003BB /* WatchFaceManager.swift in Sources */,
+				A100040400000000000004BB /* WeatherManager.swift in Sources */,
+				A100050500000000000005BB /* StocksManager.swift in Sources */,
+				A100060600000000000006BB /* NewsManager.swift in Sources */,
+				A100070700000000000007BB /* HealthKitManager.swift in Sources */,
+				A100080800000000000008BB /* WatchFaceView.swift in Sources */,
+				A100090900000000000009BB /* HealthView.swift in Sources */,
+				A1000A0A00000000000010BB /* DataFeedsView.swift in Sources */,
+				A1000B0B00000000000011BB /* NotificationsView.swift in Sources */,
+				A100131300000000000016BB /* LunaProtocol.swift in Sources */,
+				A100141400000000000017BB /* BLEDebugView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		FF000003000000000000003A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		FF000004000000000000004A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		FF000005000000000000005A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Resources/LunaWatch.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 9BQDEVHKJZ;
+				INFOPLIST_FILE = Resources/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.lunawatchapp.LunaWatch;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		FF000006000000000000006A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Resources/LunaWatch.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 9BQDEVHKJZ;
+				INFOPLIST_FILE = Resources/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.lunawatchapp.LunaWatch;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		FF000001000000000000001A /* Build configuration list for PBXProject "LunaWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FF000003000000000000003A /* Debug */,
+				FF000004000000000000004A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FF000002000000000000002A /* Build configuration list for PBXNativeTarget "LunaWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FF000005000000000000005A /* Debug */,
+				FF000006000000000000006A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = AA000001000000000000001A /* Project object */;
+}
